@@ -4,5 +4,5 @@
 # 2 = series title
 # 3 = output folder
 
-./ffmpeg.rb "$1" "$2" "$3"
+./extract.rb "$1" "$2" "$3"
 ./subs_to_json.rb "$3/$2" "$2" --remove-clean
