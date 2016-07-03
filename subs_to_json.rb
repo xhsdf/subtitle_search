@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 
 require 'pathname'
+require 'json'
 
 input_folder = ARGV[0]
 series = ARGV[1]
@@ -9,25 +10,15 @@ compact = ARGV.include? '--compact' # keep only 1 screenshot per line
 
 
 def main(input_folder, series, remove_clean, compact)
-	sws = {}
-	File.open("#{input_folder}/dialogue.json", 'w') do |output| 
-		output.puts "{"
-		output.puts " \"series\": \"#{series}\","
-		output.puts " \"episodes\": ["
-		Pathname.new(input_folder).children.select do |folder| folder.directory? end.sort.each_with_index do |folder, i|
-			output.print "      ," if i > 0
-			output.puts " {"
-			output.puts "  \"name\": \"#{folder.basename}\","
-			output.puts "  \"languages\": ["
-			Pathname.new(folder).children.select do |file| file.to_s.end_with? ".ass" end.each_with_index do |file, u|
-				lang = file.basename.to_s.gsub(".ass", "")
+	File.open("#{input_folder}/dialogue.json", 'w') do |output|
+		sws = {}
+		s = { "series" => series, "episodes" => [] }
+		Pathname.new(input_folder).children.select do |folder| folder.directory? end.sort.each do |folder|
+			e = { "name" => folder.basename, "languages" => [] }
+			Pathname.new(folder).children.select do |file| file.to_s.end_with? ".ass" end.each do |file|
+				l = { "lang" => file.basename.to_s.gsub(".ass", ""), "dialogues" => [] }
 				sws = []
-				output.print "      ," if u > 0
-				output.puts "  {"
-				output.puts "   \"lang\": \"#{lang}\","
-				output.puts "   \"dialogues\": ["
-				File.readlines(file).select do |line| line.start_with? "Dialogue: " end.each_with_index do |line, o|
-					output.print "      ," if o > 0
+				File.readlines(file).select do |line| line.start_with? "Dialogue: " end.each do |line|
 					start_seconds, end_seconds, text = parse_line(line)
 					if compact
 						sws << (((start_seconds + 1) + end_seconds) / 2)
@@ -36,28 +27,23 @@ def main(input_folder, series, remove_clean, compact)
 							sws << i
 						end
 					end
-					output.puts "   { \"s\": \"#{start_seconds}\", \"e\": \"#{end_seconds}\", \"t\": \"#{text.strip.gsub("\\", "\\\\\\\\").gsub('"', '\"')}\" }"
+					l["dialogues"] << ({ "s" => start_seconds, "e" => end_seconds, "t" => text.gsub(/[\r\n]/, '')})
 				end
-				output.puts "   ]"
-				output.puts "  }"
 
 				if remove_clean or compact
-					Pathname.new("#{folder}/#{lang}").children.select do |screen| screen.file? and screen.basename.to_s =~ /^\d+\.jpg$/ end.each do |screen|
+					Pathname.new("#{folder}/#{l['lang']}").children.select do |screen| screen.file? and screen.basename.to_s =~ /^\d+\.jpg$/ end.each do |screen|
 						u = screen.basename.to_s.gsub('.jpg', '').to_i
 						unless sws.include? u
 							screen.unlink
 						end
 					end
 				end
+				e["languages"] << l
 			end
-			output.puts "  ]"
-			output.puts " }"
+			s["episodes"] << e
 		end
-
-		output.puts " ]"
-		output.puts "}"
+		output.write s.to_json
 	end
-
 end
 
 
@@ -75,7 +61,6 @@ def parse_line(line)
 	text = splits[9..-1].join(',').gsub(/\{[^\}]+\}/, '')
 	return timestamp_to_seconds(startTime), timestamp_to_seconds(endTime), text
 end
-
 
 
 main(input_folder, series, remove_clean, compact)
