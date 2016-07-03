@@ -1,6 +1,6 @@
 var max_results = 30
 var min_length = 3
-var source = GetURLParameter('source') + '/dialogue.json';
+var source = GetURLParameter('source');
 var clean = GetURLParameter('clean') == '1';
 var compact = GetURLParameter('compact') != '0';
 var data;
@@ -31,7 +31,7 @@ function timestamp(secs) {
 }
 
 
-$.getJSON(source,function(json) {data = json});
+$.getJSON(source + '/dialogue.json',function(json) {data = json});
 
 function toggle_image(el, url) {
 	var i = $.inArray(url, added_images);
@@ -57,7 +57,7 @@ function search() {
 			$.each(language.dialogues, function(o,dialogue) {
 			if (dialogue.t.toLowerCase().indexOf(q.toLowerCase()) !=-1) {
 				if (results < max_results){
-					$("#results").append("<div><p><span style=\"font-weight:bold\">" + dialogue.t + "</span> (" + episode.name + ": " + timestamp(dialogue.s) + " - " + timestamp(dialogue.e) + ")" + "</p>" + image_elements('output/' + data.series + '/' + episode.name, language.lang, parseInt(dialogue.s) + 1, parseInt(dialogue.e)) + "</div>");
+					$("#results").append("<div><p><span style=\"font-weight:bold\">" + dialogue.t + "</span> (" + episode.name + ": " + timestamp(dialogue.s) + " - " + timestamp(dialogue.e) + ")" + "</p>" + image_elements(source + '/' + episode.name, language.lang, parseInt(dialogue.s) + 1, parseInt(dialogue.e)) + "</div>");
 				} else {
 					$("#results").append("<div><p><span style=\"font-weight:bold\">" + dialogue.t + "</span> (" + episode.name + ": " + timestamp(dialogue.s) + " - " + timestamp(dialogue.e) + ")" + "</p></div>");
 				}

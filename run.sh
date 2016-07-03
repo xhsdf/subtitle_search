@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# 1 = Folder or file
-# 2 = series title
-# 3 = output folder
+input=$1
+output=$2
+title=${3-$(basename "$input")}
 
-./extract.rb "$1" "$2" "$3"
-./subs_to_json.rb "$3/$2" "$2" --compact
+./extract.rb "$input" "$output" "$title"
+./subs_to_json.rb "$output/$title" "$title" --compact

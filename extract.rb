@@ -6,8 +6,8 @@ require 'rexml/document'
 include REXML
 
 input_folder = ARGV[0]
-series = ARGV[1]
-output_main_dir = ARGV[2]
+output_main_dir = ARGV[1]
+series = ARGV[2]
 clean = ARGV.include? '--clean'
 
 
