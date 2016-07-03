@@ -30,13 +30,11 @@ def main(input_folder, series, remove_clean, compact)
 					output.print "      ," if o > 0
 					start_seconds, end_seconds, text = parse_line(line)
 					if compact
-						puts (((start_seconds + 1) + end_seconds) / 2)
 						sws << (((start_seconds + 1) + end_seconds) / 2)
 					elsif remove_clean
 						for i in (start_seconds + 1)..end_seconds
 							sws << i
 						end
-						sws.uniq!
 					end
 					output.puts "   { \"s\": \"#{start_seconds}\", \"e\": \"#{end_seconds}\", \"t\": \"#{text.strip.gsub("\\", "\\\\\\\\").gsub('"', '\"')}\" }"
 				end
