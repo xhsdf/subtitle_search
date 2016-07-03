@@ -2,11 +2,10 @@
 
 require 'pathname'
 
-
-
 input_folder = ARGV[0]
 series = ARGV[1]
 remove_clean = ARGV.include? '--remove-clean' # remove screenshots without subtitles in them
+
 
 def main(input_folder, series, remove_clean)
 	sws = {}
@@ -30,7 +29,7 @@ def main(input_folder, series, remove_clean)
 					output.print "      ," if o > 0
 					start_seconds, end_seconds, text = parse_line(line)
 					if remove_clean
-						for i in start_seconds..end_seconds
+						for i in (start_seconds + 1)..end_seconds
 							sws << i
 						end
 					end
