@@ -49,6 +49,7 @@ function toggle_image(el, url) {
 
 function search() {
 	var q = $("#searchterm").val();
+	var regex = new RegExp(q,"gi");
 	var results = 0
 	$("#results").empty();
 	if (q.length >= min_length) {
@@ -56,7 +57,7 @@ function search() {
 		$.each(data.episodes, function(i,episode){
 		$.each(episode.languages, function(u,language) {
 			$.each(language.dialogues, function(o,dialogue) {
-			if (dialogue.t.toLowerCase().indexOf(q.toLowerCase()) !=-1) {
+			if (regex.test(dialogue.t)) {
 				if (unlimited || results < max_results){
 					$("#results").append("<div><p><span style=\"font-weight:bold\">" + dialogue.t + "</span> (" + episode.name + ": " + timestamp(dialogue.s) + " - " + timestamp(dialogue.e) + ")" + "</p>" + image_elements(source + '/' + episode.name, language.lang, parseInt(dialogue.s) + 1, parseInt(dialogue.e)) + "</div>");
 				} else {
