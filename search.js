@@ -25,20 +25,31 @@ function init_drop_down(data) {
 	document.getElementById("results_menu").selectedIndex = 3;
 }
 
+
 function image_elements(url, lang, start, end) {
 	string = ""
 	if (compact) {
-		start = Math.floor((start + end) / 2.0)
+		start = get_mid_image(start, end)
 		end = start
 	}
 	for (i = start; i <= end; i++) {
-		string += "<span onclick=\"toggle_image(this, '" + url + "/" + lang + "/" + i + ".jpg" + "');\">" + timestamp(i) + "</span>";
+		string += "<span" + get_image_function(url, lang, i) + ">" + timestamp(i) + "</span>";
 		if (clean) {
-			string += " <span onclick=\"toggle_image(this, '" + url + "/none/" + i + ".jpg" + "');\">(clean)</span>";
+			string += " <span" + get_image_function(url, 'none', i) + ">(clean)</span>";
 		}
 		string += "<br/>";
 	}
 	return string;
+}
+
+
+function get_image_function(url, lang, i) {
+	return " onclick=\"toggle_image(this, '" + url + "/" + lang + "/" + i + ".jpg" + "');\"";
+}
+
+
+function get_mid_image(start, end) {
+	return Math.floor((start + end) / 2.0);
 }
 
 
@@ -57,7 +68,7 @@ function toggle_image(el, url) {
 			el.removeChild(el.lastChild);
 		}
 	} else {
-		$(el).append("<br/><image src=\"" + url + "\"/>");
+		$(el).append("<br/><image src=\"" + url + "\"/><br/>");
 		added_images.push(url);
 	}
 }
@@ -76,7 +87,7 @@ function search() {
 				$.each(language.dialogues, function(o, dialogue) {
 				if ((scope == dropdown_default || scope == episode.name) && regex.test(dialogue.t)) {
 					if (unlimited || results < max_results){
-						$("#results").append("<div><p><span style=\"font-weight:bold\">" + dialogue.t + "</span> (" + episode.name + ": " + timestamp(dialogue.s) + " - " + timestamp(dialogue.e) + ")" + "</p>" + image_elements(source + '/' + episode.name, language.lang, parseInt(dialogue.s) + 1, parseInt(dialogue.e)) + "</div>");
+						$("#results").append("<div><p><span" + (compact ? get_image_function(source + '/' + episode.name, language.lang, get_mid_image(parseInt(dialogue.s) + 1, parseInt(dialogue.e))) : "") + " style=\"font-weight:bold\">" + dialogue.t + "</span> (" + episode.name + ": " + timestamp(dialogue.s) + " - " + timestamp(dialogue.e) + ")" + "</p>" + (compact ? "" : image_elements(source + '/' + episode.name, language.lang, parseInt(dialogue.s) + 1, parseInt(dialogue.e))) + "</div>");
 					}
 					results++;
 				}
