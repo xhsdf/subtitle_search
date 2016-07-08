@@ -8,6 +8,21 @@ var data;
 var xmlDoc;
 var xml_data;
 var added_images = [];
+var dropdown_default = 'all';
+
+
+$.getJSON(source + '/dialogue.json',function(json) {data = json; init_drop_down(data);});
+
+function init_drop_down(data) {
+	$("#episode_menu").append('<option>' + dropdown_default + '</option>');
+	$.each(data.episodes, function(x, episode) {
+			$("#episode_menu").append('<option>' + episode.name +'</option>');
+	});
+	var max_results_array = [50, 100, 250, 500, 999999]
+	for (i = 0; i < max_results_array.length; i++) {
+		$("#results_menu").append('<option>' + max_results_array[i] + '</option>');
+	}
+}
 
 function image_elements(url, lang, start, end) {
 	string = ""
@@ -25,14 +40,13 @@ function image_elements(url, lang, start, end) {
 	return string;
 }
 
+
 function timestamp(secs) {
 	var t = new Date(1970,0,1);
 	t.setSeconds(secs);
 	return t.toTimeString().substr(0,8);
 }
 
-
-$.getJSON(source + '/dialogue.json',function(json) {data = json});
 
 function toggle_image(el, url) {
 	var i = $.inArray(url, added_images);
@@ -47,39 +61,39 @@ function toggle_image(el, url) {
 	}
 }
 
+
 function search() {
 	var q = $("#searchterm").val();
 	var regex = new RegExp(q,"gi");
+	var max_results = parseInt($('#results_menu').find(":selected").text());
 	var results = 0
+	var scope = $('#episode_menu').find(":selected").text();
 	$("#results").empty();
-	if (q.length >= min_length) {
-		$("#results").append("<p>Results for <b>" + q + "</b></p>");
-		$.each(data.episodes, function(i,episode){
-		$.each(episode.languages, function(u,language) {
-			$.each(language.dialogues, function(o,dialogue) {
-			if (regex.test(dialogue.t)) {
-				if (unlimited || results < max_results){
-					$("#results").append("<div><p><span style=\"font-weight:bold\">" + dialogue.t + "</span> (" + episode.name + ": " + timestamp(dialogue.s) + " - " + timestamp(dialogue.e) + ")" + "</p>" + image_elements(source + '/' + episode.name, language.lang, parseInt(dialogue.s) + 1, parseInt(dialogue.e)) + "</div>");
-				} else {
-					$("#results").append("<div><p><span style=\"font-weight:bold\">" + dialogue.t + "</span> (" + episode.name + ": " + timestamp(dialogue.s) + " - " + timestamp(dialogue.e) + ")" + "</p></div>");
+	if (q.length >= min_length || scope != dropdown_default) {
+		$.each(data.episodes, function(i, episode){
+			$.each(episode.languages, function(u, language) {
+				$.each(language.dialogues, function(o, dialogue) {
+				if ((scope == dropdown_default || scope == episode.name) && regex.test(dialogue.t)) {
+					if (unlimited || results < max_results){
+						$("#results").append("<div><p><span style=\"font-weight:bold\">" + dialogue.t + "</span> (" + episode.name + ": " + timestamp(dialogue.s) + " - " + timestamp(dialogue.e) + ")" + "</p>" + image_elements(source + '/' + episode.name, language.lang, parseInt(dialogue.s) + 1, parseInt(dialogue.e)) + "</div>");
+					} else {
+						$("#results").append("<div><p><span style=\"font-weight:bold\">" + dialogue.t + "</span> (" + episode.name + ": " + timestamp(dialogue.s) + " - " + timestamp(dialogue.e) + ")" + "</p></div>");
+					}
+					results++;
 				}
-				results++;
-			}
+				});
 			});
-		});
 		});
 	}
 }
 
-function GetURLParameter(sParam)
-{
+
+function GetURLParameter(sParam) {
 	var sPageURL = window.location.search.substring(1);
 	var sURLVariables = sPageURL.split('&');
-	for (var i = 0; i < sURLVariables.length; i++) 
-	{
+	for (var i = 0; i < sURLVariables.length; i++) {
 		var sParameterName = sURLVariables[i].split('=');
-		if (sParameterName[0] == sParam) 
-		{
+		if (sParameterName[0] == sParam) {
 			return sParameterName[1];
 		}
 	}
@@ -87,3 +101,5 @@ function GetURLParameter(sParam)
 
 
 $("#searchterm").keyup(function(e) {search()});
+$("#episode_menu").change(function(e) {search()});
+$("#results_menu").change(function(e) {search()});
