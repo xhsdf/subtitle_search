@@ -76,14 +76,15 @@ function search() {
 				if ((scope == dropdown_default || scope == episode.name) && regex.test(dialogue.t)) {
 					if (unlimited || results < max_results){
 						$("#results").append("<div><p><span style=\"font-weight:bold\">" + dialogue.t + "</span> (" + episode.name + ": " + timestamp(dialogue.s) + " - " + timestamp(dialogue.e) + ")" + "</p>" + image_elements(source + '/' + episode.name, language.lang, parseInt(dialogue.s) + 1, parseInt(dialogue.e)) + "</div>");
-					} else {
-						$("#results").append("<div><p><span style=\"font-weight:bold\">" + dialogue.t + "</span> (" + episode.name + ": " + timestamp(dialogue.s) + " - " + timestamp(dialogue.e) + ")" + "</p></div>");
 					}
 					results++;
 				}
 				});
 			});
 		});
+		if(results > max_results) {
+			$("#results").append("<div><p style=\"font-weight:bold\">+" + (results - max_results)  + " results</p></div>");
+		}
 	}
 }
 
