@@ -1,7 +1,8 @@
-var max_results = 30
+var max_results = 300
 var min_length = 3
 var source = GetURLParameter('source');
 var clean = GetURLParameter('clean') == '1';
+var unlimited = GetURLParameter('unlimited') == '1';
 var compact = GetURLParameter('compact') != '0';
 var data;
 var xmlDoc;
@@ -56,7 +57,7 @@ function search() {
 		$.each(episode.languages, function(u,language) {
 			$.each(language.dialogues, function(o,dialogue) {
 			if (dialogue.t.toLowerCase().indexOf(q.toLowerCase()) !=-1) {
-				if (results < max_results){
+				if (unlimited || results < max_results){
 					$("#results").append("<div><p><span style=\"font-weight:bold\">" + dialogue.t + "</span> (" + episode.name + ": " + timestamp(dialogue.s) + " - " + timestamp(dialogue.e) + ")" + "</p>" + image_elements(source + '/' + episode.name, language.lang, parseInt(dialogue.s) + 1, parseInt(dialogue.e)) + "</div>");
 				} else {
 					$("#results").append("<div><p><span style=\"font-weight:bold\">" + dialogue.t + "</span> (" + episode.name + ": " + timestamp(dialogue.s) + " - " + timestamp(dialogue.e) + ")" + "</p></div>");
