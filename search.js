@@ -22,6 +22,7 @@ function init_drop_down(data) {
 	for (i = 0; i < max_results_array.length; i++) {
 		$("#results_menu").append('<option>' + max_results_array[i] + '</option>');
 	}
+	document.getElementById("results_menu").selectedIndex = 3;
 }
 
 function image_elements(url, lang, start, end) {
