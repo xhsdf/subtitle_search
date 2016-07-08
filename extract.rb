@@ -51,7 +51,9 @@ end
 def main(file, series, output_main_dir, clean)
 	file = Pathname.new(file)
 	if file.directory?
-		file.children.select do |cfile| cfile.file? end.each do |cfile|
+		files = file.children.select do |cfile| cfile.file? end.sort
+		files.each_with_index do |cfile, i|
+			print "#{i + 1}/#{files.size} "
 			main(cfile, series, output_main_dir, clean)
 		end
 	elsif file.file?
