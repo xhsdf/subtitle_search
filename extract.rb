@@ -3,6 +3,7 @@
 require 'pathname'
 require 'fileutils'
 require 'rexml/document'
+require 'shellwords'
 include REXML
 
 input_folder = ARGV[0]
@@ -14,7 +15,7 @@ clean = ARGV.include? '--clean'
 def run(file, series, output_main_dir, clean)
 	filename = file.basename
 	puts filename
-	output_dir = "#{output_main_dir}/#{"#{series}/#{filename}".gsub("\"", "''").gsub("'", "´")}"
+	output_dir = "#{output_main_dir}/#{series}/#{filename}"
 	FileUtils.mkdir_p output_dir
 	
 	get_subtitle_tracks(file, clean).each do |index, lang|
@@ -24,7 +25,7 @@ def run(file, series, output_main_dir, clean)
 		sub_param = ""
 		if lang != 'none'
 			system("ffmpeg -i \"#{file}\" -loglevel error -y -map 0:#{index} \"#{subtitle_dir}.ass\"")
-			sub_param = ", ass='#{subtitle_dir}.ass'"
+			sub_param = ", ass=#{Shellwords.escape(subtitle_dir.gsub("'", "\\\\\\\\'"))}.ass"
 		end
 		puts "  extracting screencaps with subtitle track: #{lang}..."
 		system("ffmpeg -i \"#{file}\" -loglevel error -start_number 0 -stats -vf \"scale=-1:480, fps=1#{sub_param}\" -q:v 1 \"#{subtitle_dir}\"/%d.jpg")
