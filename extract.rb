@@ -14,7 +14,7 @@ clean = ARGV.include? '--clean'
 def run(file, series, output_main_dir, clean)
 	filename = file.basename
 	puts filename
-	output_dir = "#{output_main_dir}/#{series}/#{filename}".gsub("'", "´")
+	output_dir = "#{output_main_dir}/#{"#{series}/#{filename}".gsub("\"", "''").gsub("'", "´")}"
 	FileUtils.mkdir_p output_dir
 	
 	get_subtitle_tracks(file, clean).each do |index, lang|
