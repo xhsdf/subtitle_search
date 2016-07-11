@@ -25,10 +25,10 @@ def run(file, series, output_main_dir, clean)
 		sub_param = ""
 		if lang != 'none'
 			system("ffmpeg -i \"#{file}\" -loglevel error -y -map 0:#{index} \"#{subtitle_dir}.ass\"")
-			sub_param = ", ass=#{Shellwords.escape(subtitle_dir.gsub("'", "\\\\\\\\'"))}.ass"
+			sub_param = ", ass='#{subtitle_dir.gsub("'", "\'\\\\\\\\\\\\'\'")}.ass'" # ¯\_(ツ)_/¯
 		end
 		puts "  extracting screencaps with subtitle track: #{lang}..."
-		system("ffmpeg -i \"#{file}\" -loglevel error -start_number 0 -stats -vf \"scale=-1:480, fps=1#{sub_param}\" -q:v 1 \"#{subtitle_dir}\"/%d.jpg")
+		system("ffmpeg", "-i", file.to_s, "-loglevel", "error", "-start_number", "0", "-stats", "-vf", "scale=-1:480, fps=1#{sub_param}", "-q:v", "1", "#{subtitle_dir}/%d.jpg")
 	end
 end
 
