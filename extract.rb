@@ -3,7 +3,6 @@
 require 'pathname'
 require 'fileutils'
 require 'rexml/document'
-require 'shellwords'
 include REXML
 
 input_folder = ARGV[0]
