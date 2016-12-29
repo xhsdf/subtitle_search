@@ -76,7 +76,7 @@ function toggle_image(el, url) {
 
 function search() {
 	var q = $("#searchterm").val();
-	var regex = new RegExp(q,"gi");
+	var regex = new RegExp(q,"i");
 	var max_results = parseInt($('#results_menu').find(":selected").text());
 	var results = 0
 	var scope = $('#episode_menu').find(":selected").text();
